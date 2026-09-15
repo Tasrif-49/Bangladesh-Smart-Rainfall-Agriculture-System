@@ -957,7 +957,7 @@ def build_on_demand_history(
 
             f" Previous day rainfall "
 
-            f"({previous_day.strftime('%d %B %Y')}) "
+            f"({previous_day.strftime('%Y-%m-%d')}) "
 
             f"= {float(previous_rain):.2f} mm "
 

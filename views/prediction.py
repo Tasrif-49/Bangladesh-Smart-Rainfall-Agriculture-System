@@ -51,22 +51,60 @@ def condition(code, pred=None):
             )
 
     if code in [0, 1]:
+
         return (
             "☀️ Sunny",
             "Clear weather."
         )
 
     elif code in [2, 3, 45, 48]:
+
         return (
             "☁️ Cloudy",
             "Cloudy conditions."
         )
 
     else:
+
         return (
             "🌧️ Rainy",
             "Rainy conditions."
         )
+
+
+# ============================================================
+# RAIN PROBABILITY
+# ============================================================
+
+def estimate_rain_probability(pred):
+
+    """
+    Estimate rainfall likelihood from predicted rainfall amount.
+
+    IMPORTANT:
+    This is an estimated UI score based on predicted rainfall.
+    It is NOT a calibrated statistical probability from the
+    regression model.
+    """
+
+    pred = max(float(pred), 0.0)
+
+    if pred <= 0:
+
+        probability = 5.0
+
+    else:
+
+        probability = 100 * (
+            1 - np.exp(-pred / 18)
+        )
+
+    probability = min(
+        max(probability, 0),
+        100
+    )
+
+    return probability
 
 
 # ============================================================
@@ -78,6 +116,7 @@ def safe_float(value, default=0.0):
     try:
 
         if pd.isna(value):
+
             return float(default)
 
         return float(value)
@@ -122,6 +161,10 @@ def create_prediction_features(
             (data["Date"] == target_date)
         )
     ].copy()
+
+    # ========================================================
+    # TARGET ROW
+    # ========================================================
 
     target_row = {
 
@@ -212,7 +255,9 @@ def create_prediction_features(
         "rain_sum": np.nan
     }
 
-    target_df = pd.DataFrame([target_row])
+    target_df = pd.DataFrame(
+        [target_row]
+    )
 
     data = pd.concat(
         [
@@ -232,10 +277,18 @@ def create_prediction_features(
     # ========================================================
 
     data["year"] = data["Date"].dt.year
+
     data["month"] = data["Date"].dt.month
+
     data["day"] = data["Date"].dt.day
-    data["dayofyear"] = data["Date"].dt.dayofyear
-    data["dayofweek"] = data["Date"].dt.dayofweek
+
+    data["dayofyear"] = (
+        data["Date"].dt.dayofyear
+    )
+
+    data["dayofweek"] = (
+        data["Date"].dt.dayofweek
+    )
 
     data["weekofyear"] = (
         data["Date"]
@@ -262,25 +315,33 @@ def create_prediction_features(
 
     data["dayofyear_sin"] = (
         np.sin(
-            2 * np.pi * data["dayofyear"] / 365.25
+            2 * np.pi
+            * data["dayofyear"]
+            / 365.25
         )
     )
 
     data["dayofyear_cos"] = (
         np.cos(
-            2 * np.pi * data["dayofyear"] / 365.25
+            2 * np.pi
+            * data["dayofyear"]
+            / 365.25
         )
     )
 
     data["dayofweek_sin"] = (
         np.sin(
-            2 * np.pi * data["dayofweek"] / 7
+            2 * np.pi
+            * data["dayofweek"]
+            / 7
         )
     )
 
     data["dayofweek_cos"] = (
         np.cos(
-            2 * np.pi * data["dayofweek"] / 7
+            2 * np.pi
+            * data["dayofweek"]
+            / 7
         )
     )
 
@@ -289,12 +350,21 @@ def create_prediction_features(
     # ========================================================
 
     RAIN_LAGS = [
-        1, 2, 3, 5, 7, 14, 21, 30
+        1,
+        2,
+        3,
+        5,
+        7,
+        14,
+        21,
+        30
     ]
 
     for lag in RAIN_LAGS:
 
-        data[f"rain_lag_{lag}"] = (
+        data[
+            f"rain_lag_{lag}"
+        ] = (
             data
             .groupby("Station_ID")["rain_sum"]
             .shift(lag)
@@ -379,16 +449,27 @@ def create_prediction_features(
     same_day_weather = [
 
         "temperature_2m_mean",
+
         "temperature_2m_max",
+
         "temperature_2m_min",
+
         "apparent_temperature_mean",
+
         "sunshine_duration",
+
         "daylight_duration",
+
         "wind_speed_10m_max",
+
         "wind_gusts_10m_max",
+
         "wind_direction_10m_dominant",
+
         "shortwave_radiation_sum",
+
         "weather_code",
+
         "et0_fao_evapotranspiration"
 
     ]
@@ -569,9 +650,7 @@ def show_prediction(
 ):
 
     # ========================================================
-    # IMPORTANT:
-    # Do NOT use [class*="css"] here.
-    # Streamlit Cloud may use different generated CSS classes.
+    # PAGE TITLE
     # ========================================================
 
     st.title(
@@ -624,11 +703,11 @@ def show_prediction(
     today = date.today()
 
     selected_date = st.date_input(
-        "📅 Prediction Date",
-        value=today,
-        key="prediction_date",
-        format="DD/MM/YYYY"
-    )
+    "📅 Prediction Date",
+    value=today,
+    key="prediction_date",
+    format="YYYY/MM/DD"
+)
 
     target = pd.Timestamp(
         selected_date
@@ -639,7 +718,9 @@ def show_prediction(
     # ========================================================
 
     is_future = selected_date > today
+
     is_today = selected_date == today
+
     is_past = selected_date < today
 
     if is_future:
@@ -739,6 +820,7 @@ def show_prediction(
                 )
 
                 st.session_state.weather_values = None
+
                 st.session_state.weather_error = error
 
             else:
@@ -793,21 +875,21 @@ def show_prediction(
 
             st.success(
                 f"🔮 Forecast Weather Loaded: "
-                f"{target.strftime('%d %B %Y')}"
+                f"{target.strftime('%Y-%m-%d')}"
             )
 
         elif is_today:
 
             st.success(
                 f"✅ Today's Weather Data Loaded: "
-                f"{target.strftime('%d %B %Y')}"
+                f"{target.strftime('%Y-%m-%d')}"
             )
 
         else:
 
             st.success(
                 f"📚 Historical Weather Data Loaded: "
-                f"{target.strftime('%d %B %Y')}"
+                f"{target.strftime('%Y-%m-%d')}"
             )
 
     # ========================================================
@@ -827,7 +909,9 @@ def show_prediction(
             "You can edit any value if needed."
         )
 
+        # ====================================================
         # ROW 1
+        # ====================================================
 
         c1, c2, c3, c4 = st.columns(4)
 
@@ -871,7 +955,9 @@ def show_prediction(
             )
         )
 
+        # ====================================================
         # ROW 2
+        # ====================================================
 
         c1, c2, c3, c4 = st.columns(4)
 
@@ -911,7 +997,9 @@ def show_prediction(
             )
         )
 
+        # ====================================================
         # ROW 3
+        # ====================================================
 
         c1, c2, c3, c4 = st.columns(4)
 
@@ -967,6 +1055,10 @@ def show_prediction(
     if submitted:
 
         try:
+
+            # =================================================
+            # WEATHER VALUES
+            # =================================================
 
             values = {
 
@@ -1158,28 +1250,48 @@ def show_prediction(
             )
 
             # =================================================
+            # RAIN PROBABILITY
+            # =================================================
+
+            rain_probability = (
+                estimate_rain_probability(pred)
+            )
+
+            # =================================================
             # SAVE RESULT
             # =================================================
 
             st.session_state.rain_prediction = {
 
-                "prediction": pred,
+                "prediction":
+                pred,
 
-                "station": station,
+                "rain_probability":
+                rain_probability,
 
-                "date": target,
+                "station":
+                station,
 
-                "weather_values": values,
+                "date":
+                target,
 
-                "condition": weather_name,
+                "weather_values":
+                values,
 
-                "message": message,
+                "condition":
+                weather_name,
 
-                "et0": float(et0),
+                "message":
+                message,
 
-                "history_note": bridge_note,
+                "et0":
+                float(et0),
 
-                "is_future": is_future
+                "history_note":
+                bridge_note,
+
+                "is_future":
+                is_future
             }
 
             st.session_state.last_prediction_key = (
@@ -1200,7 +1312,9 @@ def show_prediction(
 
     if "rain_prediction" in st.session_state:
 
-        result = st.session_state.rain_prediction
+        result = (
+            st.session_state.rain_prediction
+        )
 
         same_station = (
             result["station"]["Station_ID"]
@@ -1220,7 +1334,14 @@ def show_prediction(
 
             st.divider()
 
-            if result.get("is_future", False):
+            # =================================================
+            # RESULT TITLE
+            # =================================================
+
+            if result.get(
+                "is_future",
+                False
+            ):
 
                 st.subheader(
                     "🔮 Future Prediction Result"
@@ -1231,6 +1352,10 @@ def show_prediction(
                 st.subheader(
                     "🌧️ Prediction Result"
                 )
+
+            # =================================================
+            # MAIN METRICS
+            # =================================================
 
             a, b, c = st.columns(3)
 
@@ -1249,6 +1374,79 @@ def show_prediction(
                 f"{result['et0']:.2f}"
             )
 
+            # =================================================
+            # RAIN PROBABILITY
+            # =================================================
+
+            probability = float(
+                result.get(
+                    "rain_probability",
+                    estimate_rain_probability(
+                        pred
+                    )
+                )
+            )
+
+            st.markdown(
+                "### 🌧️ Rain Probability"
+            )
+
+            # Native Streamlit components.
+            # No HTML is used here.
+
+            p1, p2, p3 = st.columns(
+                [1, 2, 1]
+            )
+
+            with p2:
+
+                st.metric(
+                    "Estimated Rain Probability",
+                    f"{probability:.0f}%"
+                )
+
+                st.progress(
+                    min(
+                        max(
+                            probability / 100,
+                            0.0
+                        ),
+                        1.0
+                    )
+                )
+
+            # =================================================
+            # PROBABILITY MESSAGE
+            # =================================================
+
+            if probability < 20:
+
+                st.info(
+                    "☀️ Low rainfall likelihood."
+                )
+
+            elif probability < 50:
+
+                st.info(
+                    "🌤️ Moderate rainfall likelihood."
+                )
+
+            elif probability < 75:
+
+                st.warning(
+                    "🌧️ High rainfall likelihood."
+                )
+
+            else:
+
+                st.success(
+                    "⛈️ Very high rainfall likelihood."
+                )
+
+            # =================================================
+            # GENERAL MESSAGE
+            # =================================================
+
             st.info(
                 result["message"]
             )
@@ -1257,7 +1455,14 @@ def show_prediction(
                 result["history_note"]
             )
 
-            if result.get("is_future", False):
+            # =================================================
+            # FUTURE MESSAGE
+            # =================================================
+
+            if result.get(
+                "is_future",
+                False
+            ):
 
                 st.success(
                     "🔮 Future prediction completed. "

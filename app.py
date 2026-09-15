@@ -1155,7 +1155,7 @@ PAGES = [
 
     "🏠 Home",
     "🔮 Rain Prediction",
-    "🌱 Agriculture",
+    "🌱 Agriculture (কৃষি সেচ ব্যবস্থা)",
     "📂 Historical Data",
     "📊 Analytics",
     "ℹ️ About"

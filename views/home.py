@@ -114,7 +114,7 @@ def show_home(df):
 
     if b.button(
 
-        "🌱 Smart Agriculture",
+        "🌱 Smart Agriculture (কৃষি সেচ ব্যবস্থা)",
 
        width="stretch",
 
@@ -122,7 +122,7 @@ def show_home(df):
 
     ):
 
-        st.session_state.page = "🌱 Agriculture"
+        st.session_state.page = "🌱 Agriculture "
 
         st.rerun()
 
