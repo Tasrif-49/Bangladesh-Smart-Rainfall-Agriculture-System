@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 from datetime import date
 
@@ -702,12 +703,25 @@ def show_prediction(
 
     today = date.today()
 
+    # ========================================================
+    # STREAMLIT CALENDAR (DATE CHANGE FIX)
+    # ========================================================
+
+    if "prediction_date" not in st.session_state:
+        st.session_state.prediction_date = today
+
     selected_date = st.date_input(
-    "📅 Prediction Date",
-    value=today,
-    key="prediction_date",
-    format="YYYY/MM/DD"
-)
+        "📅 Prediction Date",
+        value=st.session_state.prediction_date,
+        key="calendar_date",
+        format="YYYY/MM/DD",
+        on_change=lambda: st.session_state.update(
+            prediction_date=st.session_state.calendar_date
+        )
+    )
+
+    # Always update target after calendar change
+    st.session_state.prediction_date = selected_date
 
     target = pd.Timestamp(
         selected_date
@@ -756,6 +770,22 @@ def show_prediction(
         f"{station['Station_ID']}_"
         f"{target.strftime('%Y%m%d')}"
     )
+
+    # Clear cached weather/result whenever station or date changes
+    if (
+        st.session_state.get("last_calendar_key")
+        != weather_key
+    ):
+        st.session_state.last_calendar_key = weather_key
+
+        if "weather_data_key" in st.session_state:
+            del st.session_state.weather_data_key
+
+        if "weather_values" in st.session_state:
+            del st.session_state.weather_values
+
+        if "rain_prediction" in st.session_state:
+            del st.session_state.rain_prediction
 
     # ========================================================
     # CLEAR OLD RESULT
@@ -1335,7 +1365,196 @@ def show_prediction(
             st.divider()
 
             # =================================================
-            # RESULT TITLE
+            # RAIN PROBABILITY (ABOVE RESULT METRICS)
+            # =================================================
+
+            probability = float(
+                result.get(
+                    "rain_probability",
+                    estimate_rain_probability(
+                        pred
+                    )
+                )
+            )
+
+            st.markdown(
+                "### 🌧️ Rainfall Probability"
+            )
+
+            # =================================================
+            # SPEEDOMETER STYLE RAIN PROBABILITY GAUGE
+            # =================================================
+
+            theta = np.linspace(0, 180, 120)
+            # =================================================
+            # PERFECT DONUT STYLE DASHBOARD SPEEDOMETER
+            # =================================================
+
+            import math
+
+            fig = go.Figure()
+
+            # Donut style semicircle using scatter filled shapes
+            center_x = 0
+            center_y = 0
+
+            outer_r = 1.0
+            inner_r = 0.78
+
+            segments = [
+                (0, 25, "#22C55E"),
+                (25, 50, "#FACC15"),
+                (50, 75, "#FB923C"),
+                (75, 100, "#EF4444")
+            ]
+
+            for low, high, color in segments:
+
+                a1 = math.pi - math.pi * high / 100
+                a2 = math.pi - math.pi * low / 100
+
+                angles = np.linspace(a1, a2, 120)
+
+                x_outer = outer_r * np.cos(angles)
+                y_outer = outer_r * np.sin(angles)
+
+                x_inner = inner_r * np.cos(angles[::-1])
+                y_inner = inner_r * np.sin(angles[::-1])
+
+                x = np.concatenate([x_outer, x_inner])
+                y = np.concatenate([y_outer, y_inner])
+
+                fig.add_trace(
+                    go.Scatter(
+                        x=x,
+                        y=y,
+                        fill="toself",
+                        mode="lines",
+                        line=dict(
+                            width=0
+                        ),
+                        fillcolor=color,
+                        hoverinfo="skip",
+                        showlegend=False
+                    )
+                )
+
+            # Inner white face
+            face_angles = np.linspace(math.pi, 0, 200)
+
+            fig.add_trace(
+                go.Scatter(
+                    x=inner_r*np.cos(face_angles),
+                    y=inner_r*np.sin(face_angles),
+                    fill="toself",
+                    mode="lines",
+                    line=dict(width=0),
+                    fillcolor="#FFFFFF",
+                    hoverinfo="skip",
+                    showlegend=False
+                )
+            )
+
+            # Needle
+            needle_angle = math.pi - math.pi * probability / 100
+
+            fig.add_trace(
+                go.Scatter(
+                    x=[
+                        0,
+                        0.68*math.cos(needle_angle)
+                    ],
+                    y=[
+                        0,
+                        0.68*math.sin(needle_angle)
+                    ],
+                    mode="lines",
+                    line=dict(
+                        color="#F97316",
+                        width=6
+                    ),
+                    hoverinfo="skip",
+                    showlegend=False
+                )
+            )
+
+            # Center knob
+            fig.add_trace(
+                go.Scatter(
+                    x=[0],
+                    y=[0],
+                    mode="markers",
+                    marker=dict(
+                        size=18,
+                        color="#F97316",
+                        line=dict(
+                            color="white",
+                            width=3
+                        )
+                    ),
+                    hoverinfo="skip",
+                    showlegend=False
+                )
+            )
+
+            fig.add_annotation(
+                x=0,
+                y=0.25,
+                text=f"<b>{probability:.1f}%</b>",
+                showarrow=False,
+                font=dict(
+                    size=38,
+                    color="#0F172A"
+                )
+            )
+
+            fig.add_annotation(
+                x=0,
+                y=-0.05,
+                text="RAIN PROBABILITY",
+                showarrow=False,
+                font=dict(
+                    size=12,
+                    color="#64748B"
+                )
+            )
+
+            fig.update_layout(
+                height=330,
+                margin=dict(
+                    l=20,
+                    r=20,
+                    t=10,
+                    b=10
+                ),
+                xaxis=dict(
+                    visible=False,
+                    range=[-1.15,1.15],
+                    scaleanchor="y",
+                    scaleratio=1
+                ),
+                yaxis=dict(
+                    visible=False,
+                    range=[-0.2,1.1]
+                ),
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)"
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+                config={
+                    "displayModeBar": False
+                }
+            )
+
+            st.caption(
+                "Probability is estimated from the predicted rainfall amount."
+            )
+
+            # =================================================
+            # PREDICTION RESULT TITLE (WITH METRICS)
             # =================================================
 
             if result.get(
@@ -1373,47 +1592,6 @@ def show_prediction(
                 "ET0",
                 f"{result['et0']:.2f}"
             )
-
-            # =================================================
-            # RAIN PROBABILITY
-            # =================================================
-
-            probability = float(
-                result.get(
-                    "rain_probability",
-                    estimate_rain_probability(
-                        pred
-                    )
-                )
-            )
-
-            st.markdown(
-                "### 🌧️ Rain Probability"
-            )
-
-            # Native Streamlit components.
-            # No HTML is used here.
-
-            p1, p2, p3 = st.columns(
-                [1, 2, 1]
-            )
-
-            with p2:
-
-                st.metric(
-                    "Estimated Rain Probability",
-                    f"{probability:.0f}%"
-                )
-
-                st.progress(
-                    min(
-                        max(
-                            probability / 100,
-                            0.0
-                        ),
-                        1.0
-                    )
-                )
 
             # =================================================
             # PROBABILITY MESSAGE

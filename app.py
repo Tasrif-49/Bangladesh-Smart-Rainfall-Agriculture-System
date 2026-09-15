@@ -1155,7 +1155,7 @@ PAGES = [
 
     "🏠 Home",
     "🔮 Rain Prediction",
-    "🌱 Agriculture (কৃষি সেচ ব্যবস্থা)",
+    "🌱 Agriculture Irrigation (কৃষি সেচ ব্যবস্থা)",
     "📂 Historical Data",
     "📊 Analytics",
     "ℹ️ About"
@@ -1248,8 +1248,7 @@ elif page == "🔮 Rain Prediction":
     )
 
 
-elif page == "🌱 Agriculture":
-
+elif page == "🌱 Agriculture Irrigation (কৃষি সেচ ব্যবস্থা)":
     show_agriculture()
 
 
@@ -1289,8 +1288,8 @@ quick_pages = [
     ),
 
     (
-        "🌱 Agriculture",
-        "🌱 Agriculture"
+    "🌱 Agriculture",
+    "🌱 Agriculture Irrigation (কৃষি সেচ ব্যবস্থা)"
     ),
 
     (
