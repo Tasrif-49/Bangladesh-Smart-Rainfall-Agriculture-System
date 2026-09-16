@@ -130,11 +130,99 @@ def show_analytics(df):
     )
 
 
+    fig.update_layout(
+
+
+
+        height=400,
+
+
+
+        dragmode=False,
+
+
+
+        hovermode="closest",
+
+
+
+        uirevision="constant"
+
+
+
+    )
+
+
+
+
     st.plotly_chart(
+
+
 
         fig,
 
-       width="stretch"
+
+
+        use_container_width=True,
+
+
+
+        config={
+
+
+
+            "displayModeBar": True,
+
+
+
+            "displaylogo": False,
+
+
+
+            "scrollZoom": False,
+
+
+
+            "doubleClick": False,
+
+
+
+            "modeBarButtonsToRemove": [
+
+
+
+                "pan2d",
+
+
+
+                "select2d",
+
+
+
+                "lasso2d",
+
+
+
+                "zoomIn2d",
+
+
+
+                "zoomOut2d"
+
+
+
+            ]
+
+
+
+        },
+
+
+
+        key="analytics_chart_1"
+
+
+
     )
 
 
@@ -180,11 +268,98 @@ def show_analytics(df):
         )
 
 
+        fig.update_layout(
+
+
+
+            height=400,
+
+
+
+            dragmode=False,
+
+
+
+            hovermode="closest",
+
+
+
+            uirevision="constant"
+
+
+
+        )
+
+
+
+
         st.plotly_chart(
+
+
 
             fig,
 
-           width="stretch"
+
+
+            use_container_width=True,
+
+
+
+            config={
+
+
+
+                "displayModeBar": True,
+
+
+
+                "displaylogo": False,
+
+
+
+                "scrollZoom": False,
+
+
+
+                "doubleClick": False,
+
+
+
+                "modeBarButtonsToRemove": [
+
+
+
+                    "pan2d",
+
+
+
+                    "select2d",
+
+
+
+                    "lasso2d",
+
+
+
+                    "zoomIn2d",
+
+
+
+                    "zoomOut2d"
+
+
+
+                ]
+
+
+
+            },
+
+
+
+            key="analytics_chart_2"
+
+
 
         )
 
@@ -205,11 +380,98 @@ def show_analytics(df):
         )
 
 
+        fig.update_layout(
+
+
+
+            height=400,
+
+
+
+            dragmode=False,
+
+
+
+            hovermode="closest",
+
+
+
+            uirevision="constant"
+
+
+
+        )
+
+
+
+
         st.plotly_chart(
+
+
 
             fig,
 
-           width="stretch"
+
+
+            use_container_width=True,
+
+
+
+            config={
+
+
+
+                "displayModeBar": True,
+
+
+
+                "displaylogo": False,
+
+
+
+                "scrollZoom": False,
+
+
+
+                "doubleClick": False,
+
+
+
+                "modeBarButtonsToRemove": [
+
+
+
+                    "pan2d",
+
+
+
+                    "select2d",
+
+
+
+                    "lasso2d",
+
+
+
+                    "zoomIn2d",
+
+
+
+                    "zoomOut2d"
+
+
+
+                ]
+
+
+
+            },
+
+
+
+            key="analytics_chart_3"
+
+
 
         )
 
@@ -233,11 +495,98 @@ def show_analytics(df):
         )
 
 
+        fig.update_layout(
+
+
+
+            height=400,
+
+
+
+            dragmode=False,
+
+
+
+            hovermode="closest",
+
+
+
+            uirevision="constant"
+
+
+
+        )
+
+
+
+
         st.plotly_chart(
+
+
 
             fig,
 
-           width="stretch"
+
+
+            use_container_width=True,
+
+
+
+            config={
+
+
+
+                "displayModeBar": True,
+
+
+
+                "displaylogo": False,
+
+
+
+                "scrollZoom": False,
+
+
+
+                "doubleClick": False,
+
+
+
+                "modeBarButtonsToRemove": [
+
+
+
+                    "pan2d",
+
+
+
+                    "select2d",
+
+
+
+                    "lasso2d",
+
+
+
+                    "zoomIn2d",
+
+
+
+                    "zoomOut2d"
+
+
+
+                ]
+
+
+
+            },
+
+
+
+            key="analytics_chart_4"
+
+
 
         )
 
@@ -258,11 +607,98 @@ def show_analytics(df):
         )
 
 
+        fig.update_layout(
+
+
+
+            height=400,
+
+
+
+            dragmode=False,
+
+
+
+            hovermode="closest",
+
+
+
+            uirevision="constant"
+
+
+
+        )
+
+
+
+
         st.plotly_chart(
+
+
 
             fig,
 
-           width="stretch"
+
+
+            use_container_width=True,
+
+
+
+            config={
+
+
+
+                "displayModeBar": True,
+
+
+
+                "displaylogo": False,
+
+
+
+                "scrollZoom": False,
+
+
+
+                "doubleClick": False,
+
+
+
+                "modeBarButtonsToRemove": [
+
+
+
+                    "pan2d",
+
+
+
+                    "select2d",
+
+
+
+                    "lasso2d",
+
+
+
+                    "zoomIn2d",
+
+
+
+                    "zoomOut2d"
+
+
+
+                ]
+
+
+
+            },
+
+
+
+            key="analytics_chart_5"
+
+
 
         )
 
@@ -311,10 +747,97 @@ def show_analytics(df):
     )
 
 
+    fig.update_layout(
+
+
+
+        height=400,
+
+
+
+        dragmode=False,
+
+
+
+        hovermode="closest",
+
+
+
+        uirevision="constant"
+
+
+
+    )
+
+
+
+
     st.plotly_chart(
+
+
 
         fig,
 
-       width="stretch"
+
+
+        use_container_width=True,
+
+
+
+        config={
+
+
+
+            "displayModeBar": True,
+
+
+
+            "displaylogo": False,
+
+
+
+            "scrollZoom": False,
+
+
+
+            "doubleClick": False,
+
+
+
+            "modeBarButtonsToRemove": [
+
+
+
+                "pan2d",
+
+
+
+                "select2d",
+
+
+
+                "lasso2d",
+
+
+
+                "zoomIn2d",
+
+
+
+                "zoomOut2d"
+
+
+
+            ]
+
+
+
+        },
+
+
+
+        key="analytics_chart_6"
+
+
 
     )

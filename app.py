@@ -1031,6 +1031,9 @@ hr {
 }
 
 
+
+
+
 /* =========================================================
    HIDE STREAMLIT DEFAULT
 ========================================================= */
@@ -1103,6 +1106,12 @@ footer {
             1.3rem !important;
     }
 
+}
+
+
+/* Plotly interaction stability */
+.js-plotly-plot .svg-container {
+    touch-action: manipulation !important;
 }
 
 </style>

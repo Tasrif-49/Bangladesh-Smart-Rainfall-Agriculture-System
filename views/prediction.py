@@ -1521,20 +1521,25 @@ def show_prediction(
 
             fig.update_layout(
                 height=330,
+                autosize=True,
                 margin=dict(
                     l=20,
                     r=20,
                     t=10,
                     b=10
                 ),
+                dragmode=False,
+                hovermode=False,
                 xaxis=dict(
                     visible=False,
+                    fixedrange=True,
                     range=[-1.15,1.15],
                     scaleanchor="y",
                     scaleratio=1
                 ),
                 yaxis=dict(
                     visible=False,
+                    fixedrange=True,
                     range=[-0.2,1.1]
                 ),
                 paper_bgcolor="rgba(0,0,0,0)",
@@ -1545,7 +1550,11 @@ def show_prediction(
                 fig,
                 use_container_width=True,
                 config={
-                    "displayModeBar": False
+                    "displayModeBar": False,
+                    "scrollZoom": False,
+                    "doubleClick": False,
+                    "staticPlot": True,
+                    "responsive": True
                 }
             )
 
