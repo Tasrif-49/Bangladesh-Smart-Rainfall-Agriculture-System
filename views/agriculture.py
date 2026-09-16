@@ -36,6 +36,55 @@ def bn_num(value, decimals=0, comma=False):
     return bn_digits(text)
 
 
+
+
+def bn_streamlit_input(label, default=0.0, key="bn_input"):
+    if key not in st.session_state:
+        st.session_state[key] = bn_digits(f"{default:.2f}")
+
+    def convert():
+        value = st.session_state[key]
+        st.session_state[key] = bn_digits(str(value))
+
+    value = st.text_input(label, key=key, on_change=convert)
+
+    try:
+        return float(str(value).translate(
+            str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+        ))
+    except:
+        return default
+
+
+
+def bangla_all_numeric_input(label, default=0.0, key="bn_all_input", step=0.01):
+    """
+    Streamlit friendly numeric input.
+    Keeps layout unchanged and converts English digits to Bangla display.
+    """
+    if key not in st.session_state:
+        st.session_state[key] = bn_digits(f"{default:.2f}")
+
+    def update_bn():
+        value = st.session_state[key]
+        st.session_state[key] = bn_digits(value)
+
+    st.text_input(
+        label,
+        key=key,
+        on_change=update_bn
+    )
+
+    value = st.session_state[key]
+
+    try:
+        return float(str(value).translate(
+            str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+        ))
+    except:
+        return default
+
+
 def remove_english_parentheses(text):
     """যেমন 'শতক (Decimal)' -> 'শতক'।"""
     text = str(text)
@@ -228,18 +277,18 @@ def show_agriculture():
 
             c1, c2 = st.columns(2)
 
-            predicted_rain = c1.number_input(
+            predicted_rain = c1.empty()
+            predicted_rain = bn_streamlit_input(
                 "আজকের বৃষ্টির পরিমাণ (মিমি)",
-                min_value=0.0,
-                value=0.0,
-                step=0.5,
+                default=0.0,
+                key="rain_bn"
             )
 
-            et0_value = c2.number_input(
+            et0_value = c2.empty()
+            et0_value = bn_streamlit_input(
                 "বাষ্পীভবন হার",
-                min_value=0.0,
-                value=4.0,
-                step=0.1,
+                default=4.0,
+                key="et0_bn"
             )
 
     # ========================================================
@@ -249,19 +298,19 @@ def show_agriculture():
     else:
         c1, c2 = st.columns(2)
 
-        predicted_rain = c1.number_input(
-            "আজকের বৃষ্টির পরিমাণ (মিমি)",
-            min_value=0.0,
-            value=0.0,
-            step=0.5,
-        )
+        with c1:
+            predicted_rain = bangla_all_numeric_input(
+                "আজকের বৃষ্টির পরিমাণ (মিমি)",
+                default=0.0,
+                key="rain_all_bn"
+            )
 
-        et0_value = c2.number_input(
-            "বাষ্পীভবন হার",
-            min_value=0.0,
-            value=4.0,
-            step=0.1,
-        )
+        with c2:
+            et0_value = bangla_all_numeric_input(
+                "বাষ্পীভবন হার",
+                default=4.0,
+                key="et0_all_bn"
+            )
 
     # ========================================================
     # জমির তথ্য
@@ -274,16 +323,17 @@ def show_agriculture():
 
     c1, c2 = st.columns(2)
 
-    land_area = c1.number_input(
-        "জমির পরিমাণ",
-        min_value=0.01,
-        value=1.0,
-        step=0.01,
-    )
+    with c1:
+        land_area = bn_streamlit_input(
+            "জমির পরিমাণ",
+            default=1.0,
+            key="land_area_bn"
+        )
 
-    # backend-এর original string রাখা হয়েছে
-    area_unit = c2.selectbox(
-        "জমির একক",
+    with c2:
+        # backend-এর original string রাখা হয়েছে
+        area_unit = st.selectbox(
+            "জমির একক",
         [
             "শতক (Decimal)",
             "একর (Acre)",
@@ -374,11 +424,10 @@ def show_agriculture():
     custom_depth_cm = 0.0
 
     if water_measurement == custom_water_key:
-        custom_depth_cm = st.number_input(
+        custom_depth_cm = bangla_all_numeric_input(
             "পানির গভীরতা সেন্টিমিটারে দিন",
-            min_value=0.0,
-            value=0.0,
-            step=0.5,
+            default=0.0,
+            key="water_depth_all_bn"
         )
 
     existing_water_mm = convert_water_depth_to_mm(
